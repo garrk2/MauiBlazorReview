@@ -1,0 +1,133 @@
+@page "/"
+@using DoublesMatch2.Services
+@using DoublesMatch2.Models
+@inject PlayerService PlayerService
+
+<div class="header">
+    <h2>DoublesMatch2 (Team Selection Tool)</h2>
+</div>
+
+<div class="toolbar section">
+    <label>Select Player List:</label>
+    <select @bind="SelectedList">
+        @foreach (var list in PlayerService.AvailableLists)
+        {
+            <option value="@list">@list</option>
+        }
+    </select>
+    <button class="btn" @onclick="RefreshPlayers">Refresh Players</button>
+
+    <span style="margin-left:24px">Auto Select Courts:</span>
+    <select @bind="DefaultCourtCount">
+        <option value="0"></option>
+        @for (int i=1;i<=12;i++)
+        {
+            <option value="@i">@i</option>
+        }
+    </select>
+</div>
+
+<div class="section">
+    <strong>Allocate Waiting</strong>
+    <div>
+        <input type="radio" id="first" name="waiting" checked @onchange="(()=> WaitingMode = WaitingMode.First)" />
+        <label for="first">First</label>
+        <input type="radio" id="random" name="waiting" style="margin-left:16px" @onchange="(()=> WaitingMode = WaitingMode.Random)" />
+        <label for="random">Random</label>
+    </div>
+</div>
+
+<div class="section">
+    <strong>Player Mixture Options</strong>
+    <div>
+        <label><input type="radio" name="mix" checked @onchange="(()=> MixOption = MixOption.Random)" /> Random</label>
+        <label><input type="radio" name="mix" @onchange="(()=> MixOption = MixOption.HighLow)" /> Mix High with Low Players</label>
+        <label><input type="radio" name="mix" @onchange="(()=> MixOption = MixOption.SimilarHL)" /> Mix Similar Ratings (H &gt; L)</label>
+        <label><input type="radio" name="mix" @onchange="(()=> MixOption = MixOption.SimilarLH)" /> Mix Similar Ratings (L &gt; H)</label>
+        <label><input type="radio" name="mix" @onchange="(()=> MixOption = MixOption.PartnerRotation)" /> Partner Tracking Rotation</label>
+    </div>
+</div>
+
+<div class="section">
+    <strong>Gender Mix Options</strong>
+    <div>
+        <label><input type="radio" name="gender" checked @onchange="(()=> GenderMix = GenderMix.Random)" /> Random</label>
+        <label><input type="radio" name="gender" @onchange="(()=> GenderMix = GenderMix.MF)" /> Mens &gt; Ladies (C.1–12)</label>
+        <label><input type="radio" name="gender" @onchange="(()=> GenderMix = GenderMix.FM)" /> Ladies &gt; Mens (C.1–12)</label>
+    </div>
+</div>
+
+<div class="section">
+    <strong>Waiting Players List</strong>
+    <table class="grid">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Rating</th>
+                <th style="width:70px">xPlayed</th>
+                <th style="width:90px">LastCourt</th>
+                <th style="width:60px">Bkd</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var p in WaitingPlayers)
+        {
+            <tr>
+                <td>@p.Name</td>
+                <td>@p.Rating</td>
+                <td>@p.XPlayed</td>
+                <td>@p.LastCourt</td>
+                <td>@p.Booked</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+<div class="toolbar">
+    <button @onclick="SetAllYes">Set All to "Yes"</button>
+    <button @onclick="SetAllNo">Set All to "No"</button>
+    <button @onclick="ClearXPlayed">Clear x Played</button>
+    <button @onclick="NewLocationList">New Location List</button>
+    <button @onclick="RemoveLocationList">Remove Location List</button>
+</div>
+
+<div class="section">
+    <strong>Stats</strong>
+    <div>Avg. Game Length (Mins): <input type="number" style="width:60px" @bind="AvgGameLength" /></div>
+    <div>Average Games Played: <span>@AvgGamesPlayed</span></div>
+</div>
+
+@code {
+    private string SelectedList = "Default";
+    private int DefaultCourtCount = 0;
+    private WaitingMode WaitingMode = WaitingMode.First;
+    private MixOption MixOption = MixOption.Random;
+    private GenderMix GenderMix = GenderMix.Random;
+
+    private List<Player> WaitingPlayers = new();
+    private int AvgGameLength = 15;
+    private int AvgGamesPlayed = 0;
+
+    protected override void OnInitialized()
+    {
+        RefreshPlayers();
+    }
+
+    private void RefreshPlayers()
+    {
+        WaitingPlayers = PlayerService.GetPlayers(SelectedList).ToList();
+        AvgGamesPlayed = (int)Math.Round(WaitingPlayers.Select(p => p.XPlayed).DefaultIfEmpty(0).Average());
+        StateHasChanged();
+    }
+
+    private void SetAllYes() { /* TODO: mark all as playing */ }
+    private void SetAllNo() { /* TODO: mark all as not playing */ }
+    private void ClearXPlayed() { foreach (var p in WaitingPlayers) p.XPlayed = 0; StateHasChanged(); }
+    private void NewLocationList() { /* TODO */ }
+    private void RemoveLocationList() { /* TODO */ }
+}
+
+enum WaitingMode { First, Random }
+enum MixOption { Random, HighLow, SimilarHL, SimilarLH, PartnerRotation }
+enum GenderMix { Random, MF, FM }

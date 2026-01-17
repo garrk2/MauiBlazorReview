@@ -1,0 +1,13 @@
+
+body { font-family: system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+.header { display:flex; align-items:center; gap: 12px; }
+.toolbar { display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+.grid { width:100%; border-collapse: collapse; }
+.grid th, .grid td { border: 1px solid #ddd; padding: 6px; }
+.grid th { background: #f3f3f3; }
+.section { margin: 12px 0; padding: 12px; background: #f8ffff; border: 1px solid #d0eef0; }
+.badge { padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; }
+.badge.beginner { background: #ffe066; }
+.badge.novice { background: #b2f2bb; }
+.badge.intermediate { background: #ff922b; }
+.badge.advanced { background: #faa2c1; }

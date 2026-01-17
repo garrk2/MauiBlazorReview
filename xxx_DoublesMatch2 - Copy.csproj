@@ -1,0 +1,28 @@
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+
+
+<PropertyGroup>
+  <TargetFrameworks>
+    net9.0-windows10.0.19041.0;net9.0-android;net9.0-ios;net9.0-maccatalyst
+  </TargetFrameworks>
+
+  <!-- Recommended supported baselines for MAUI 9 templates -->
+  <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
+  <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
+
+  <!-- For Android on .NET 9, valid TargetPlatformVersion is 35.0; avoid 34.0 on net9 -->
+  <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">35.0</SupportedOSPlatformVersion>
+</PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="9.0.120" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <MauiAsset Include="Resources\**\*" />
+    <MauiImage Include="Resources\Images\*" />
+    <MauiFont Include="Resources\Fonts\*" Alias="*" />
+  </ItemGroup>
+</Project>
